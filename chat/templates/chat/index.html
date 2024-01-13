@@ -1,0 +1,40 @@
+{% extends "chat/base.html" %}
+
+{% block title %}Home{% endblock title %}
+
+{% block body %}
+    <form action="/chat/" method="POST">
+        {% csrf_token %}
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content" style="background-color: skyblue;">
+                <h5 class="mx-2 my-2 text-center">Create A New Room</h5>
+                <input class="mx-3 mb-4" type="text" name="room_name" placeholder="Enter Room Name...">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </form>
+    <h4 class="my-2" style="text-align: center;">Welcome to ChattyChat - Khul Ke Baatein karo</h4>
+    <div class="container" style="text-align: center; height: fit-content; margin-top: 20px; background-color: lightslategray;" >
+            <div class="card ms-3">
+                <div class="card-body">
+                <h5 class="card-title mb-3">
+                    Available Chatrooms
+                    <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        +
+                    </button>
+                </h5>
+                <ul class="list-group">
+                    {% for group in available_rooms %}
+                        <a href="/chat/{{group.name}}" class="list-group-item list-group-item-action">{{group.name}}</a>
+                    {% endfor %}            
+                </ul>
+
+                </div>
+            </div>
+    </div>
+{% endblock body %}

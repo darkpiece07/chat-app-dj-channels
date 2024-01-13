@@ -1,0 +1,68 @@
+{% extends "chat/base.html" %}
+
+{% block title %}Chat{% endblock title %}
+
+{% block body %}
+  
+    <div class="d-flex h-100 text-center text-bg-light" >
+        <div class="card ms-3" style="width: 25rem; height: fit-content; margin-top: 81px; background-color: lightslategray;">
+            <div class="card-body">
+              <h5 class="card-title">
+                Available Chatrooms
+              <ul class="list-group">
+                {% for group in available_rooms %}
+                    <a href="/chat/{{group.name}}" class="list-group-item list-group-item-action">{{group.name}}</a>
+                {% endfor %}            
+              </ul>
+
+            </div>
+        </div>
+        <div class="cover-container d-flex w-100 h-100 px-3 mx-auto flex-column">
+            <h1 class="my-3" style="text-align:center;">Welcome to {{room_name}} chatroom</h1>
+            <textarea id="chat-messages" name="messages" cols="80" rows="15">
+                {% for chat in chats %}
+                    {{chat.content}} 
+                {% endfor %}
+            </textarea> <br>
+            <input id="message-input" type="text" class="my-3" size="80"> <br>
+            <input class="mb-2" style="width: fit-content; text-align: center;" id="message-submit" type="button" value="Send Your Message">
+        </div>
+    </div>
+
+    
+    {{room_name | json_script:"room-name"}}
+
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent)
+        const ws = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        ws.onopen = function() {
+            console.log("web socket connection is open...")
+        }
+
+        ws.onmessage = function(event) {
+            data = JSON.parse(event.data)
+            document.querySelector("#chat-messages").innerHTML += data.user + " : " + data.message + ('\n');
+        }
+
+        document.querySelector("#message-submit").onclick = function(event) {
+            const messageInputDom = document.querySelector("#message-input");
+            const message = messageInputDom.value;
+            ws.send(JSON.stringify({
+                'message': message,
+            }));
+            messageInputDom.value = ''
+        };
+
+        ws.onclose = function(event) {
+            console.log("websocket connection is closed...")
+        }
+    </script>
+
+{% endblock body %}
